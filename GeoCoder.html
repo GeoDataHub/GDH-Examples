@@ -12,41 +12,24 @@
             crossorigin=""></script>
 </head>
 <body>
-<div id="map" style="height: 500px"></div>
+<input id="searchBar" type="text" placeholder="Search for an address" value="Tartu Riia 24">
+<pre id="response"></pre>
 </body>
 <script>
 
-    var url = "https://api.geodatahub.eu/gc?";
-    var query = "&q=" + "riia 24";
-    var extraParam = "&limit=2";
-    var apiKey = "&apikey=" + "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0IiwianRpIjoiNTciLCJ0cyI6MTU2MDE1Mzc3NjM2MiwiaXNzIjoiaHR0cDovL3JlYWNoLXUuY29tIn0.DhFSNG9hIB6hZJOj3jNLME1VRQs4UQnHxHKPMyuEFI0";
-    var requestUrl = encodeURI(url + query + extraParam + apiKey);
-    var mapURl = "https://api.geodatahub.eu/wms/service?" + apiKey;
+    var url = "https://gdh-api.reach-u.com/gc?";
+    var apiKey = "&apikey=" + "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0IiwianRpIjoiMTM1IiwidHMiOjE1NTk2NDYyNzczODEsImlzcyI6Imh0dHA6Ly9yZWFjaC11LmNvbSJ9.jw8fRm6l078YGqLPv5KAKUV_PheRSqJyrC6s9fpvFXM";
+    var searchBar= document.getElementById("searchBar");
 
+    const geoCode = async () => {
+        let input = "&q=" + searchBar.value;
+        let requestUrl = encodeURI(url + input + apiKey);
+        const req = await fetch(requestUrl);
+        const res = await req.json();
+        response.innerHTML = res.features.map(x => x.properties.full_address).join("\n");
+    };
 
-    var map = L.map('map', {
-        crs: L.CRS.EPSG3857,
-        center: [56.944856, 24.977423],
-        zoom: 12
-    });
-
-    map.whenReady(function () {
-        fetch(requestUrl).then(function (response) {
-            return response.json();
-        }).then(function (myJson) {
-            var bbox = myJson.features[0].bbox;
-            var lat = bbox[1];
-            var lon = bbox[0];
-            map.flyTo([lat, lon]);
-            L.marker([lat, lon]).addTo(map);
-        })
-    });
-
-    L.tileLayer.wms(mapURl, {
-        layers: 'GDHdefault',
-        format: 'image/png',
-        version: "1.3.0"
-    }).addTo(map);
-
+    searchBar.addEventListener("keyup",geoCode);
+    geoCode();
 </script>
 </html>

@@ -16,14 +16,16 @@
 </body>
 
 <script>
-    var apiKey = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0IiwianRpIjoiNTciLCJ0cyI6MTU2MDE1Mzc3NjM2MiwiaXNzIjoiaHR0cDovL3JlYWNoLXUuY29tIn0.DhFSNG9hIB6hZJOj3jNLME1VRQs4UQnHxHKPMyuEFI0";
-
-    var url = "https://api.geodatahub.eu/wms/service?&apikey=" + apiKey;
+    var apiKey = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0IiwianRpIjoiMTM1IiwidHMiOjE1NTk2NDYyNzczODEsImlzcyI6Imh0dHA6Ly9yZWFjaC11LmNvbSJ9.jw8fRm6l078YGqLPv5KAKUV_PheRSqJyrC6s9fpvFXM";
+    var zoom = 9;
+    var tileX = 579;
+    var tileY = 709;
+    var url = "https://gdh-api.reach-u.com/tms/GDHdefault/GLOBAL_WEBMERCATOR/"+ zoom + "/" + tileX +"/" + tileY +".png?&apikey=" + apiKey;
 
     var map = L.map('map', {
         crs: L.CRS.EPSG3857
 
-    }).setView([58.371475, 26.717015], 13);
+    }).setView([58.371475, 26.717015], zoom);
 
     L.tileLayer.wms(url, {
         layers: 'GDHdefault',
