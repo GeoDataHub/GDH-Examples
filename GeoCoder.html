@@ -10,13 +10,13 @@
     <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"
             integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og=="
             crossorigin=""></script>
+
 </head>
 <body>
 <input id="searchBar" type="text" placeholder="Search for an address" value="Tartu Riia 24">
 <pre id="response"></pre>
 </body>
 <script>
-
     var url = "https://gdh-api.reach-u.com/gc?";
     var apiKey = "&apikey=" + "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0IiwianRpIjoiMTM1IiwidHMiOjE1NTk2NDYyNzczODEsImlzcyI6Imh0dHA6Ly9yZWFjaC11LmNvbSJ9.jw8fRm6l078YGqLPv5KAKUV_PheRSqJyrC6s9fpvFXM";
     var searchBar= document.getElementById("searchBar");
@@ -33,3 +33,4 @@
     geoCode();
 </script>
 </html>
+

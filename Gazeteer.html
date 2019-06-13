@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        div {
+            width: 100px;
+        }
+
+        select {
+            width: 100px;
+            align-items: center;
+            margin: 15px;
+        }
+    </style>
+    <script
+            src="https://code.jquery.com/jquery-3.4.1.min.js"
+            integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+            crossorigin="anonymous"></script>
+</head>
+<body>
+<div id="choices" style="display: block">
+    <select id="l"></select>
+    <select id="l0" class="test" onchange="query(this)"></select>
+    <select id="l1" class="test"></select>
+    <select id="l2" class="test"></select>
+    <select id="l3" class="test"></select>
+    <select id="l4" class="test"></select>
+    <select id="l5" class="test"></select>
+    <select id="l6" class="test"></select>
+    <select id="l7" class="test"></select>
+    <select id="l8" class="test"></select>
+    <select id="l9" class="test"></select>
+    <button onclick="query()">refresh</button>
+</div>
+</body>
+<script>
+    var query = () => {
+
+        var selectValues = new Array();
+        $('#choices').find('.test').each(function () {
+            console.log(this);
+            if ($(this).val() != null) {
+                selectValues.push(this.id + "=" + $(this).val());
+            }
+        });
+        console.log(selectValues);
+        console.log(selectValues.length);
+        answer(selectValues.join("&"), selectValues.length);
+
+    };
+
+    var answer = (queryParam, level) => {
+        console.log(level);
+        console.log(queryParam);
+        //get json based on query
+        $.getJSON("https://gdh-api.reach-u.com/gz/" + level + "?" + queryParam + "&apikey=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0IiwianRpIjoiMTM1IiwidHMiOjE1NTk2NDYyNzczODEsImlzcyI6Imh0dHA6Ly9yZWFjaC11LmNvbSJ9.jw8fRm6l078YGqLPv5KAKUV_PheRSqJyrC6s9fpvFXM", function (result) {
+            console.log(result);
+
+            //if response is empty check if other levels have responses
+            if(result.length === 0 && level < 9){
+                    answer(queryParam, level+1);
+            }
+
+            //remove elements that are after the selected box
+           let levels = "#l" + result[0].level.substr(-1);
+            for (let i = result[0].level.substr(-1 +1); i < 10; i++) {
+                $("#l"+i).empty();
+            }
+            //add response to the element
+            result.forEach((element) => {
+                $(levels).append($('<option>', {
+                    text: element.value,
+                }));
+            });
+        })
+    };
+
+    $(".test").change(() => {
+        query();
+    });
+    /*
+
+        var levels = async () => {
+            var selected = $("#gazeteer option:selected").text();
+
+            document.querySelectorAll('.selectionBoxes').forEach(a => {
+                a.remove()
+            });
+            let requestUrl = "https://gdh-api.reach-u.com/gz/levels/" + selected + "?apikey=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0IiwianRpIjoiMTM1IiwidHMiOjE1NTk2NDYyNzczODEsImlzcyI6Imh0dHA6Ly9yZWFjaC11LmNvbSJ9.jw8fRm6l078YGqLPv5KAKUV_PheRSqJyrC6s9fpvFXM";
+
+            $.getJSON(requestUrl, function (result) {
+                $.each(result, function (i, field) {
+                    $("#choices").append($('<select>', {
+                        id: i,
+                        'class': 'selectionBoxes'
+                    }));
+                });
+            });
+    }
+
+        $(document).ready(function () {
+            $.getJSON("https://gdh-api.reach-u.com/gz/levels?apikey=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0IiwianRpIjoiMTM1IiwidHMiOjE1NTk2NDYyNzczODEsImlzcyI6Imh0dHA6Ly9yZWFjaC11LmNvbSJ9.jw8fRm6l078YGqLPv5KAKUV_PheRSqJyrC6s9fpvFXM", function (result) {
+                $.each(result, function (i, field) {
+                    $("#gazeteer").append($('<option>', {
+                        text: i,
+                        'id': field,
+                    }));
+                });
+            })
+        });
+
+        var populateSelect = async () => {
+            $(".selectionBoxes").append($('<option>', {
+                text: "Eesti",
+            }));
+        }
+
+    */
+
+    $(document).ready(function () {
+        $.getJSON("https://gdh-api.reach-u.com/gz/levels?apikey=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0IiwianRpIjoiMTM1IiwidHMiOjE1NTk2NDYyNzczODEsImlzcyI6Imh0dHA6Ly9yZWFjaC11LmNvbSJ9.jw8fRm6l078YGqLPv5KAKUV_PheRSqJyrC6s9fpvFXM", function (result) {
+            $.each(result, function (i, field) {
+                ;
+                $("#l").append($('<option>', {
+                    text: i,
+                }));
+                $("#l0").append($('<option>', {
+                    text: field,
+                }));
+            });
+        })
+    });
+
+</script>
+</html>
