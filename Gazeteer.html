@@ -23,11 +23,11 @@
 <div id="choices" style="display: block">
     <select id="l"></select>
     <select id="l0" class="test" onchange="query(this)"></select>
-    <select id="l1" class="test"></select>
-    <select id="l2" class="test"></select>
-    <select id="l3" class="test"></select>
-    <select id="l4" class="test"></select>
-    <select id="l5" class="test"></select>
+    <select id="l1" class="test" onchange="query(this)"></select>
+    <select id="l2" class="test" onchange="query(this)"></select>
+    <select id="l3" class="test" onchange="query(this)"></select>
+    <select id="l4" class="test" onchange="query(this)"></select>
+    <select id="l5" class="test" onchange="query(this)"></select>
     <select id="l6" class="test"></select>
     <select id="l7" class="test"></select>
     <select id="l8" class="test"></select>
@@ -36,37 +36,35 @@
 </div>
 </body>
 <script>
-    var query = () => {
-
+    var query = (val) => {
         var selectValues = new Array();
         $('#choices').find('.test').each(function () {
-            console.log(this);
             if ($(this).val() != null) {
                 selectValues.push(this.id + "=" + $(this).val());
+                if (this.id === val.id) {
+                    return false;
+                }
             }
         });
-        console.log(selectValues);
-        console.log(selectValues.length);
         answer(selectValues.join("&"), selectValues.length);
 
     };
 
     var answer = (queryParam, level) => {
-        console.log(level);
-        console.log(queryParam);
         //get json based on query
         $.getJSON("https://gdh-api.reach-u.com/gz/" + level + "?" + queryParam + "&apikey=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0IiwianRpIjoiMTM1IiwidHMiOjE1NTk2NDYyNzczODEsImlzcyI6Imh0dHA6Ly9yZWFjaC11LmNvbSJ9.jw8fRm6l078YGqLPv5KAKUV_PheRSqJyrC6s9fpvFXM", function (result) {
             console.log(result);
 
             //if response is empty check if other levels have responses
-            if(result.length === 0 && level < 9){
-                    answer(queryParam, level+1);
+            if (result.length === 0 && level < 9) {
+                answer(queryParam, level + 1);
             }
 
             //remove elements that are after the selected box
-           let levels = "#l" + result[0].level.substr(-1);
-            for (let i = result[0].level.substr(-1 +1); i < 10; i++) {
-                $("#l"+i).empty();
+            let levels = "#l" + result[0].level.substr(-1);
+            for (let i = result[0].level.substr(-1); i < 10; i++) {
+                console.log(i);
+                $("#l" + i).empty();
             }
             //add response to the element
             result.forEach((element) => {
@@ -77,9 +75,9 @@
         })
     };
 
-    $(".test").change(() => {
+    /*    $(".test").change(() => {
         query();
-    });
+    });*/
     /*
 
         var levels = async () => {
