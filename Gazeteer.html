@@ -88,14 +88,20 @@
         }
 
         //add response to the element
+        $(levels).append($('<option>', {
+          text: "--select--",
+          selected:"selected",
+          disabled: true,
+          value:""
+        }));
+
         result.forEach((element) => {
-          console.log(element);
           $(levels).append($('<option>', {
             text: element.value,
           }));
         });
         $(levels).prop('disabled', false);
-        if (result.length === 1) {
+        if (result.length === 2) {
           query($(levels));
         }
       }
