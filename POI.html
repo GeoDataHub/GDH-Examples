@@ -15,12 +15,12 @@
 <div id="map" style="height: 500px"></div>
 </body>
 <script>
-    var poi = "swedbank";
-    var apiKey = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0IiwianRpIjoiMTM1IiwidHMiOjE1NTk2NDYyNzczODEsImlzcyI6Imh0dHA6Ly9yZWFjaC11LmNvbSJ9.jw8fRm6l078YGqLPv5KAKUV_PheRSqJyrC6s9fpvFXM";
-    var requestUrl = "https://gdh-api.reach-u.com/poi?q=" + poi + "&apikey=" + apiKey  + "&limit=5";
-    var mapUrl = "https://gdh-api.reach-u.com/wms/service?&apikey=" + apiKey;
+    let poi = "swedbank";
+    const apiKey = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0IiwianRpIjoiMTM1IiwidHMiOjE1NTk2NDYyNzczODEsImlzcyI6Imh0dHA6Ly9yZWFjaC11LmNvbSJ9.jw8fRm6l078YGqLPv5KAKUV_PheRSqJyrC6s9fpvFXM";
+    let requestUrl = "https://gdh-api.reach-u.com/poi?q=" + poi + "&apikey=" + apiKey + "&limit=5";
+    const mapUrl = "https://gdh-api.reach-u.com/wms/service?&apikey=" + apiKey;
 
-    var map = L.map('map', {
+    const map = L.map('map', {
         crs: L.CRS.EPSG3857,
 
     }).setView([56.944856, 24.977423], 6);

@@ -4,14 +4,19 @@
     <meta charset="UTF-8">
     <title>Title</title>
     <style>
+        * {
+            margin: 5px;
+        }
+
         div {
-            width: 100px;
+            width: 150px;
+            margin-left: 15px;
         }
 
         select {
-            width: 100px;
+            width: 150px;
             align-items: center;
-            margin: 15px;
+
         }
     </style>
     <script
@@ -21,115 +26,93 @@
 </head>
 <body>
 <div id="choices" style="display: block">
-    <select id="l"></select>
-    <select id="l0" class="test" onchange="query(this)"></select>
-    <select id="l1" class="test" onchange="query(this)"></select>
-    <select id="l2" class="test" onchange="query(this)"></select>
-    <select id="l3" class="test" onchange="query(this)"></select>
-    <select id="l4" class="test" onchange="query(this)"></select>
-    <select id="l5" class="test" onchange="query(this)"></select>
-    <select id="l6" class="test"></select>
-    <select id="l7" class="test"></select>
-    <select id="l8" class="test"></select>
-    <select id="l9" class="test"></select>
-    <button onclick="query()">refresh</button>
+    <h3>COUNTRY</h3>
+    <select id="l0" class="test" onchange="changeStructure(); query(this)"></select>
 </div>
 </body>
 <script>
-    var query = (val) => {
-        var selectValues = new Array();
-        $('#choices').find('.test').each(function () {
-            if ($(this).val() != null) {
-                selectValues.push(this.id + "=" + $(this).val());
-                if (this.id === val.id) {
-                    return false;
-                }
-            }
-        });
-        answer(selectValues.join("&"), selectValues.length);
+  let depth = 0;
+  let divSelect = $('#choices');
+  let changeStructure = () => {
+    depth = 0;
 
-    };
+    divSelect.find('h4').remove();
+    divSelect.find('.deafult').remove();
+    let cc = $('#l0').children(':selected').attr('id');
+    $(this).parent('div.order_number').remove();
+    $.getJSON('https://gdh-api.reach-u.com/gz/levels/' + cc + '?apikey=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0IiwianRpIjoiMTM1IiwidHMiOjE1NTk2NDYyNzczODEsImlzcyI6Imh0dHA6Ly9yZWFjaC11LmNvbSJ9.jw8fRm6l078YGqLPv5KAKUV_PheRSqJyrC6s9fpvFXM', function(result) {
+      $.each(result, function(i, field) {
+        depth++;
+        i = 'l' + i.substr(-1);
+        if (i !== 'l0') {
+          divSelect.append($('<h4>', {
+            text: field,
+          }));
+          divSelect.append($('<select>', {
+            class: 'test deafult',
+            id: i,
+            onChange: 'query(this)',
+            disabled: true,
+          }));
+        }
+      });
+    });
+  };
 
-    var answer = (queryParam, level) => {
-        //get json based on query
-        $.getJSON("https://gdh-api.reach-u.com/gz/" + level + "?" + queryParam + "&apikey=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0IiwianRpIjoiMTM1IiwidHMiOjE1NTk2NDYyNzczODEsImlzcyI6Imh0dHA6Ly9yZWFjaC11LmNvbSJ9.jw8fRm6l078YGqLPv5KAKUV_PheRSqJyrC6s9fpvFXM", function (result) {
-            console.log(result);
+  let query = (val) => {
+    let selectValues = [];
+    divSelect.find('.test').each(function() {
+      if ($(this).val() != null) {
+        selectValues.push(this.id + '=' + $(this).val());
+        if (this.id === val.id) {
+          return false;
+        }
+      }
+    });
+    responseHandler(selectValues.join('&'), parseInt(selectValues.pop().substr(1, 1)) + 1);
+  };
 
-            //if response is empty check if other levels have responses
-            if (result.length === 0 && level < 9) {
-                answer(queryParam, level + 1);
-            }
+  var responseHandler = (queryParam, level) => {
+    //get json based on query
+    $.getJSON('https://gdh-api.reach-u.com/gz/' + level + '?' + queryParam + '&apikey=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0IiwianRpIjoiMTM1IiwidHMiOjE1NTk2NDYyNzczODEsImlzcyI6Imh0dHA6Ly9yZWFjaC11LmNvbSJ9.jw8fRm6l078YGqLPv5KAKUV_PheRSqJyrC6s9fpvFXM', function(result) {
+      //if response is empty check if other levels have responses
+      if (result.length === 0 && level < depth) {
+        responseHandler(queryParam, level + 1);
+      } else {
+        let currentLevel = result[0].level.substr(-1);
 
-            //remove elements that are after the selected box
-            let levels = "#l" + result[0].level.substr(-1);
-            for (let i = result[0].level.substr(-1); i < 10; i++) {
-                console.log(i);
-                $("#l" + i).empty();
-            }
-            //add response to the element
-            result.forEach((element) => {
-                $(levels).append($('<option>', {
-                    text: element.value,
-                }));
-            });
-        })
-    };
-
-    /*    $(".test").change(() => {
-        query();
-    });*/
-    /*
-
-        var levels = async () => {
-            var selected = $("#gazeteer option:selected").text();
-
-            document.querySelectorAll('.selectionBoxes').forEach(a => {
-                a.remove()
-            });
-            let requestUrl = "https://gdh-api.reach-u.com/gz/levels/" + selected + "?apikey=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0IiwianRpIjoiMTM1IiwidHMiOjE1NTk2NDYyNzczODEsImlzcyI6Imh0dHA6Ly9yZWFjaC11LmNvbSJ9.jw8fRm6l078YGqLPv5KAKUV_PheRSqJyrC6s9fpvFXM";
-
-            $.getJSON(requestUrl, function (result) {
-                $.each(result, function (i, field) {
-                    $("#choices").append($('<select>', {
-                        id: i,
-                        'class': 'selectionBoxes'
-                    }));
-                });
-            });
-    }
-
-        $(document).ready(function () {
-            $.getJSON("https://gdh-api.reach-u.com/gz/levels?apikey=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0IiwianRpIjoiMTM1IiwidHMiOjE1NTk2NDYyNzczODEsImlzcyI6Imh0dHA6Ly9yZWFjaC11LmNvbSJ9.jw8fRm6l078YGqLPv5KAKUV_PheRSqJyrC6s9fpvFXM", function (result) {
-                $.each(result, function (i, field) {
-                    $("#gazeteer").append($('<option>', {
-                        text: i,
-                        'id': field,
-                    }));
-                });
-            })
-        });
-
-        var populateSelect = async () => {
-            $(".selectionBoxes").append($('<option>', {
-                text: "Eesti",
-            }));
+        //remove elements that are after the selected box
+        let levels = '#l' + currentLevel;
+        for (let i = currentLevel; i < 10; i++) {
+          $('#l' + i).empty().attr('disabled', true);
         }
 
-    */
-
-    $(document).ready(function () {
-        $.getJSON("https://gdh-api.reach-u.com/gz/levels?apikey=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0IiwianRpIjoiMTM1IiwidHMiOjE1NTk2NDYyNzczODEsImlzcyI6Imh0dHA6Ly9yZWFjaC11LmNvbSJ9.jw8fRm6l078YGqLPv5KAKUV_PheRSqJyrC6s9fpvFXM", function (result) {
-            $.each(result, function (i, field) {
-                ;
-                $("#l").append($('<option>', {
-                    text: i,
-                }));
-                $("#l0").append($('<option>', {
-                    text: field,
-                }));
-            });
-        })
+        //add response to the element
+        result.forEach((element) => {
+          console.log(element);
+          $(levels).append($('<option>', {
+            text: element.value,
+          }));
+        });
+        $(levels).prop('disabled', false);
+        if (result.length === 1) {
+          query($(levels));
+        }
+      }
     });
+  };
+
+  //Populates the first list with options
+  $(document).ready(function() {
+    $.getJSON('https://gdh-api.reach-u.com/gz/levels?apikey=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0IiwianRpIjoiMTM1IiwidHMiOjE1NTk2NDYyNzczODEsImlzcyI6Imh0dHA6Ly9yZWFjaC11LmNvbSJ9.jw8fRm6l078YGqLPv5KAKUV_PheRSqJyrC6s9fpvFXM', function(result) {
+      $.each(result, function(i, field) {
+        $('#l0').append($('<option>', {
+          text: field,
+          id: i,
+        }));
+      });
+    });
+  });
 
 </script>
 </html>

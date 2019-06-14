@@ -16,12 +16,12 @@
 <div id="map" style="height:500px"></div>
 </body>
 <script>
-    let url = "https://gdh-api.reach-u.com/routing/trip/v1/driving/";
-    var apiKey = "apikey=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0IiwianRpIjoiMTM1IiwidHMiOjE1NTk2NDYyNzczODEsImlzcyI6Imh0dHA6Ly9yZWFjaC11LmNvbSJ9.jw8fRm6l078YGqLPv5KAKUV_PheRSqJyrC6s9fpvFXM";
-    var mapURL = "https://gdh-api.reach-u.com/wms/service?&" + apiKey;
+    const url = "https://gdh-api.reach-u.com/routing/trip/v1/driving/";
+    const apiKey = "apikey=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0IiwianRpIjoiMTM1IiwidHMiOjE1NTk2NDYyNzczODEsImlzcyI6Imh0dHA6Ly9yZWFjaC11LmNvbSJ9.jw8fRm6l078YGqLPv5KAKUV_PheRSqJyrC6s9fpvFXM";
+    const mapURL = "https://gdh-api.reach-u.com/wms/service?&" + apiKey;
 
 
-    var map = L.map('map', {
+    const map = L.map('map', {
         crs: L.CRS.EPSG3857
     }).setView([58.37417812507357, 26.715660095214844], 13);
 
@@ -31,36 +31,30 @@
         version: "1.3.0"
     }).addTo(map);
 
-    var layerGroup = L.layerGroup().addTo(map);
+    let layerGroup = L.layerGroup().addTo(map);
 
 
     //Group the markers better
     const route = async () => {
         layerGroup.clearLayers();
 
-        var first = markerOne.getLatLng();
-        var second = markerTwo.getLatLng();
-        var three = markerThree.getLatLng();
-        var four = markerFour.getLatLng();
-
+        let first = markerOne.getLatLng(), second = markerTwo.getLatLng(), three = markerThree.getLatLng(),
+            four = markerFour.getLatLng();
         // is this more readable?
         //`let requestUrl = encodeURI(${url + first.lng},${first.lat};${second.lng},${second.lat};${three.lng},${three.lat};${four.lng},${four.lat}?${apiKey}`);
-        let requestUrl = encodeURI(url + first.lng + "," + first.lat + ";" + second.lng + "," + second.lat + ";" + three.lng + "," + three.lat + ";" + four.lng + "," + four.lat + "?" + apiKey);
 
-        const req = await fetch(requestUrl);
-        const res = await req.json();
+        requestUrl = encodeURI(url + first.lng + "," + first.lat + ";" + second.lng + "," + second.lat + ";" + three.lng + "," + three.lat + ";" + four.lng + "," + four.lat + "?" + apiKey);
+
+        const request = await fetch(requestUrl);
+        const response = await request.json();
 
 
-        L.polyline(polyline.decode(res.trips[0].geometry), {color: 'red'}).addTo(layerGroup);
-    }, markerOne = L.marker(new L.LatLng(58.36274449177186, 26.713943481445316), {
-        draggable: true
-    }).addTo(map), markerTwo = L.marker(new L.LatLng(58.38983708965327, 26.728191375732425), {
-        draggable: true
-    }).addTo(map), markerThree = L.marker(new L.LatLng(58.369227006319484, 26.78071975708008), {
-        draggable: true
-    }).addTo(map), markerFour = L.marker(new L.LatLng(58.35472973793859, 26.74055099487305), {
-        draggable: true
-    }).addTo(map);
+        L.polyline(polyline.decode(response.trips[0].geometry), {color: 'red'}).addTo(layerGroup);
+    },
+        markerOne = L.marker(new L.LatLng(58.36274449177186, 26.713943481445316), {draggable: true}).addTo(map),
+        markerTwo = L.marker(new L.LatLng(58.38983708965327, 26.728191375732425), {draggable: true}).addTo(map),
+        markerThree = L.marker(new L.LatLng(58.369227006319484, 26.78071975708008), {draggable: true}).addTo(map),
+        markerFour = L.marker(new L.LatLng(58.35472973793859, 26.74055099487305), {draggable: true}).addTo(map);
 
 
     markerOne.on("dragend", () => route());
