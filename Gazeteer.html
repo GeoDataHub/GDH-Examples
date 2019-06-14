@@ -31,6 +31,7 @@
 </div>
 </body>
 <script>
+  //todo error handling when user has reached the end
   let depth = 0;
   let divSelect = $('#choices');
   let changeStructure = () => {
@@ -89,10 +90,10 @@
 
         //add response to the element
         $(levels).append($('<option>', {
-          text: "--select--",
-          selected:"selected",
+          text: '--select--',
+          selected: 'selected',
           disabled: true,
-          value:""
+          value: '',
         }));
 
         result.forEach((element) => {
