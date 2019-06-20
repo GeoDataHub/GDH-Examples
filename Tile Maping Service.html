@@ -28,7 +28,8 @@
 
     }).setView([58.371475, 26.717015], zoom);
 
-    L.tileLayer.wms(url, {
+    L.tileLayer(url, {
+        tms:true,
         layers: 'GDHdefault',
         format: 'image/png',
         version: "1.3.0"
