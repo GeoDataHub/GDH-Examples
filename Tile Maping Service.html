@@ -16,14 +16,13 @@
 </body>
 
 <script>
-    //Functions almost like WMS currently
-    var apiKey = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0IiwianRpIjoiMTM1IiwidHMiOjE1NTk2NDYyNzczODEsImlzcyI6Imh0dHA6Ly9yZWFjaC11LmNvbSJ9.jw8fRm6l078YGqLPv5KAKUV_PheRSqJyrC6s9fpvFXM";
-    var zoom = 9;
-    var tileX = 579;
-    var tileY = 709;
-    var url = "https://gdh-api.reach-u.com/tms/GDHdefault/GLOBAL_WEBMERCATOR/" + zoom + "/" + tileX + "/" + tileY + ".png?&apikey=" + apiKey;
+    const apiKey = "--apikey--";
+    const zoom = 9;
+    const tileX = 579;
+    const tileY = 709;
+    const url = "https://gdh-api.reach-u.com/tms/GDHdefault/GLOBAL_WEBMERCATOR/" + zoom + "/" + tileX + "/" + tileY + ".png?&apikey=" + apiKey;
 
-    var map = L.map('map', {
+    const map = L.map('map', {
         crs: L.CRS.EPSG3857
 
     }).setView([58.371475, 26.717015], zoom);

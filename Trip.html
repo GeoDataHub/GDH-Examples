@@ -17,9 +17,8 @@
 </body>
 <script>
     const url = "https://gdh-api.reach-u.com/routing/trip/v1/driving/";
-    const apiKey = "apikey=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0IiwianRpIjoiMTM1IiwidHMiOjE1NTk2NDYyNzczODEsImlzcyI6Imh0dHA6Ly9yZWFjaC11LmNvbSJ9.jw8fRm6l078YGqLPv5KAKUV_PheRSqJyrC6s9fpvFXM";
-    const mapURL = "https://gdh-api.reach-u.com/wms/service?&" + apiKey;
-
+    const apiKey = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0IiwianRpIjoiMTM1IiwidHMiOjE1NTk2NDYyNzczODEsImlzcyI6Imh0dHA6Ly9yZWFjaC11LmNvbSJ9.jw8fRm6l078YGqLPv5KAKUV_PheRSqJyrC6s9fpvFXM";
+    const mapURL = "https://gdh-api.reach-u.com/wms/service?&apikey=" + apiKey;
 
     const map = L.map('map', {
         crs: L.CRS.EPSG3857
@@ -33,24 +32,20 @@
 
     let layerGroup = L.layerGroup().addTo(map);
 
-
-    //Group the markers better
     const route = async () => {
         layerGroup.clearLayers();
 
-        let first = markerOne.getLatLng(), second = markerTwo.getLatLng(), three = markerThree.getLatLng(),
-            four = markerFour.getLatLng();
-        // is this more readable?
-        //`let requestUrl = encodeURI(${url + first.lng},${first.lat};${second.lng},${second.lat};${three.lng},${three.lat};${four.lng},${four.lat}?${apiKey}`);
+        const first = markerOne.getLatLng(), second = markerTwo.getLatLng(), three = markerThree.getLatLng(),
+          four = markerFour.getLatLng();
 
-        requestUrl = encodeURI(url + first.lng + "," + first.lat + ";" + second.lng + "," + second.lat + ";" + three.lng + "," + three.lat + ";" + four.lng + "," + four.lat + "?" + apiKey);
+        const requestUrl = encodeURI(url + first.lng + "," + first.lat + ";" + second.lng + "," + second.lat + ";" + three.lng + "," + three.lat + ";" + four.lng + "," + four.lat + "?apikey=" + apiKey);
 
         const request = await fetch(requestUrl);
         const response = await request.json();
 
-
         L.polyline(polyline.decode(response.trips[0].geometry), {color: 'red'}).addTo(layerGroup);
     },
+
         markerOne = L.marker(new L.LatLng(58.36274449177186, 26.713943481445316), {draggable: true}).addTo(map),
         markerTwo = L.marker(new L.LatLng(58.38983708965327, 26.728191375732425), {draggable: true}).addTo(map),
         markerThree = L.marker(new L.LatLng(58.369227006319484, 26.78071975708008), {draggable: true}).addTo(map),

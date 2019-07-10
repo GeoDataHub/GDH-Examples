@@ -15,33 +15,34 @@
 <div id="map" style="height: 500px"></div>
 </body>
 <script>
-    let poi = "swedbank";
-    const apiKey = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0IiwianRpIjoiMTM1IiwidHMiOjE1NTk2NDYyNzczODEsImlzcyI6Imh0dHA6Ly9yZWFjaC11LmNvbSJ9.jw8fRm6l078YGqLPv5KAKUV_PheRSqJyrC6s9fpvFXM";
-    let requestUrl = "https://gdh-api.reach-u.com/poi?q=" + poi + "&apikey=" + apiKey + "&limit=5";
-    const mapUrl = "https://gdh-api.reach-u.com/wms/service?&apikey=" + apiKey;
+    //Choose the point of interest to search for
+  const poi = 'swedbank';
+  const apiKey = '--apikey--';
+  const requestUrl = 'https://gdh-api.reach-u.com/poi?q=' + poi + '&apikey=' + apiKey + '&limit=5';
+  const mapUrl = 'https://gdh-api.reach-u.com/wms/service?&apikey=' + apiKey;
 
-    const map = L.map('map', {
-        crs: L.CRS.EPSG3857,
+  const map = L.map('map', {
+    crs: L.CRS.EPSG3857,
 
-    }).setView([56.944856, 24.977423], 6);
+  }).setView([56.944856, 24.977423], 6);
 
-    L.tileLayer.wms(mapUrl, {
-        layers: 'GDHdefault',
-        format: 'image/png',
-        version: "1.3.0"
-    }).addTo(map);
+  L.tileLayer.wms(mapUrl, {
+    layers: 'GDHdefault',
+    format: 'image/png',
+    version: '1.3.0',
+  }).addTo(map);
 
-    map.whenReady(function () {
-        fetch(requestUrl).then(function (response) {
-            return response.json();
-        }).then(function (myJson) {
-            var holder = myJson.features.flat();
-            holder.forEach(function (feature) {
-                var test = JSON.stringify(feature.properties);
-                L.marker([feature.bbox[1], feature.bbox[0]]).bindPopup(test).openPopup().addTo(map);
-            });
-        });
-
+  map.whenReady(function() {
+    fetch(requestUrl).then(function(response) {
+      return response.json();
+    }).then(function(myJson) {
+      let holder = myJson.features.flat();
+      holder.forEach(function(feature) {
+        let test = JSON.stringify(feature.properties);
+        L.marker([feature.bbox[1], feature.bbox[0]]).bindPopup(test).openPopup().addTo(map);
+      });
     });
+
+  });
 </script>
 </html>

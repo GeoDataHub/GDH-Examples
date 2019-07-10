@@ -31,17 +31,31 @@
 </div>
 </body>
 <script>
-  //todo error handling when user has reached the end
   let depth = 0;
+  let queryLevel = 0;
   let divSelect = $('#choices');
-  let changeStructure = () => {
-    depth = 0;
+  const apikey = '--apikey--';
 
+  //Populates the first list with options, gets currently supported countries
+  $(document).ready(function() {
+    $.getJSON('https://gdh-api.reach-u.com/gz/levels?apikey=' + apikey, function(result) {
+      $.each(result, function(i, field) {
+        $('#l0').append($('<option>', {
+          text: field,
+          id: i,
+        }));
+      });
+    });
+  });
+
+  //Since each country has different administrative divisions, the structure needs to be changed based on the country
+  const changeStructure = () => {
+    depth = 0;
     divSelect.find('h4').remove();
     divSelect.find('.deafult').remove();
     let cc = $('#l0').children(':selected').attr('id');
     $(this).parent('div.order_number').remove();
-    $.getJSON('https://gdh-api.reach-u.com/gz/levels/' + cc + '?apikey=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0IiwianRpIjoiMTM1IiwidHMiOjE1NTk2NDYyNzczODEsImlzcyI6Imh0dHA6Ly9yZWFjaC11LmNvbSJ9.jw8fRm6l078YGqLPv5KAKUV_PheRSqJyrC6s9fpvFXM', function(result) {
+    $.getJSON('https://gdh-api.reach-u.com/gz/levels/' + cc + '?apikey=' + apikey, function(result) {
       $.each(result, function(i, field) {
         depth++;
         i = 'l' + i.substr(-1);
@@ -60,7 +74,8 @@
     });
   };
 
-  let query = (val) => {
+
+  const query = (val) => {
     let selectValues = [];
     divSelect.find('.test').each(function() {
       if ($(this).val() != null) {
@@ -70,24 +85,27 @@
         }
       }
     });
-    responseHandler(selectValues.join('&'), parseInt(selectValues.pop().substr(1, 1)) + 1);
+    let param = selectValues.join('&');
+    queryLevel = parseInt(selectValues.pop().substr(1, 1)) + 1;
+    responseHandler(param, queryLevel);
   };
 
-  var responseHandler = (queryParam, level) => {
+  const responseHandler = (queryParam, level) => {
+    console.log(level);
+    console.log(queryParam);
     //get json based on query
-    $.getJSON('https://gdh-api.reach-u.com/gz/' + level + '?' + queryParam + '&apikey=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0IiwianRpIjoiMTM1IiwidHMiOjE1NTk2NDYyNzczODEsImlzcyI6Imh0dHA6Ly9yZWFjaC11LmNvbSJ9.jw8fRm6l078YGqLPv5KAKUV_PheRSqJyrC6s9fpvFXM', function(result) {
+    $.getJSON('https://gdh-api.reach-u.com/gz/' + level + '?' + queryParam + '&apikey=' + apikey, function(result) {
       //if response is empty check if other levels have responses
       if (result.length === 0 && level < depth) {
         responseHandler(queryParam, level + 1);
-      } else {
-        let currentLevel = result[0].level.substr(-1);
+      } else if (level < depth) {
 
         //remove elements that are after the selected box
-        let levels = '#l' + currentLevel;
-        for (let i = currentLevel; i < 10; i++) {
+        for (let i = queryLevel; i < depth; i++) {
           $('#l' + i).empty().attr('disabled', true);
         }
 
+        let levels = '#l' + level;
         //add response to the element
         $(levels).append($('<option>', {
           text: '--select--',
@@ -109,17 +127,6 @@
     });
   };
 
-  //Populates the first list with options
-  $(document).ready(function() {
-    $.getJSON('https://gdh-api.reach-u.com/gz/levels?apikey=eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0IiwianRpIjoiMTM1IiwidHMiOjE1NTk2NDYyNzczODEsImlzcyI6Imh0dHA6Ly9yZWFjaC11LmNvbSJ9.jw8fRm6l078YGqLPv5KAKUV_PheRSqJyrC6s9fpvFXM', function(result) {
-      $.each(result, function(i, field) {
-        $('#l0').append($('<option>', {
-          text: field,
-          id: i,
-        }));
-      });
-    });
-  });
 
 </script>
 </html>
