@@ -6,7 +6,7 @@ Replace apikey section with your apikey.
 Current URLs do not target geodatahub.eu but instead the testing enviorment gdh-api.reach-u.com. Geodatahub.eu apikey will not work unless URLs are changed.
 
 ## Services  
-###Web Map Service (WMS)  
+### Web Map Service (WMS)  
 Basemap service in WMS format. Contains regularly updated data layers on roads, populated places, land use, hydrography, railroads, buildings and several types of 
 points of interest, shown either as pictograms (as churches, hills, rail stations, airports) or as labels (governmental and municipal institutions, schools, supermarkets etc.).
 
