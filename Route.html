@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="height: 100%">
 <head>
     <meta charset="UTF-8">
     <title>Route Example</title>
@@ -12,49 +12,50 @@
             crossorigin=""></script>
     <script src="https://cdn.jsdelivr.net/npm/@mapbox/polyline@1.1.0/src/polyline.min.js"></script>
 </head>
-<body>
-<div id="map" style="height:500px"></div>
+<body style="height: 100%">
+<div id="map" style="height: 100%"></div>
 </body>
 <script>
-  const apiKey = '--apikey--';
-  const url = 'https://gdh-api.reach-u.com/routing/route/v1/driving/';
-  const mapURL = 'https://gdh-api.reach-u.com/wms/service?&apikey=' + apiKey;
+    const apiKey = '--apikey--';
+    const url = 'https://gdh-api.reach-u.com/routing/route/v1/driving/';
+    const mapURL = 'https://gdh-api.reach-u.com/wms/service?&apikey=' + apiKey;
 
-  const map = L.map('map', {
-    crs: L.CRS.EPSG3857,
-  }).setView([58.37417812507357, 26.715660095214844], 13);
 
-  L.tileLayer.wms(mapURL, {
-    layers: 'GDHdefault',
-    format: 'image/png',
-    version: '1.3.0',
-  }).addTo(map);
+    const map = L.map('map', {
+        crs: L.CRS.EPSG3857,
+    }).setView([58.37417812507357, 26.715660095214844], 13);
 
-  const layerGroup = L.layerGroup().addTo(map);
+    L.tileLayer.wms(mapURL, {
+        layers: 'GDHdefault',
+        format: 'image/png',
+        version: '1.3.0',
+    }).addTo(map);
 
-  const route = async () => {
-    layerGroup.clearLayers();
-    const first = markerOne.getLatLng();
-    const second = markerTwo.getLatLng();
-    const requestUrl = encodeURI(url + first.lng + ',' + first.lat + ';' + second.lng + ',' + second.lat + '?apikey=' + apiKey);
+    const layerGroup = L.layerGroup().addTo(map);
 
-    const request = await fetch(requestUrl);
-    const response = await request.json();
+    const route = async () => {
+        layerGroup.clearLayers();
+        const first = markerOne.getLatLng();
+        const second = markerTwo.getLatLng();
+        const requestUrl = encodeURI(url + first.lng + ',' + first.lat + ';' + second.lng + ',' + second.lat + '?apikey=' + apiKey);
 
-    L.polyline(polyline.decode(response.routes[0].geometry), {color: 'red'}).addTo(layerGroup);
-  };
+        const request = await fetch(requestUrl);
+        const response = await request.json();
 
-  const markerOne = L.marker(new L.LatLng(58.36274449177186, 26.713943481445316), {
-    draggable: true,
-  }).addTo(map);
+        L.polyline(polyline.decode(response.routes[0].geometry), {color: 'red'}).addTo(layerGroup);
+    };
 
-  const markerTwo = L.marker(new L.LatLng(58.38983708965327, 26.728191375732425), {
-    draggable: true,
-  }).addTo(map);
+    const markerOne = L.marker(new L.LatLng(58.36274449177186, 26.713943481445316), {
+        draggable: true,
+    }).addTo(map);
 
-  markerOne.on('dragend', () => route());
-  markerTwo.on('dragend', () => route());
-  route();
+    const markerTwo = L.marker(new L.LatLng(58.38983708965327, 26.728191375732425), {
+        draggable: true,
+    }).addTo(map);
+
+    markerOne.on('dragend', () => route());
+    markerTwo.on('dragend', () => route());
+    route();
 
 </script>
 </html>

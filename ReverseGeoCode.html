@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="height: 100%">
 <head>
     <meta charset="UTF-8">
-    <title>Web Maping Service</title>
+    <title>Reverse Geocoder</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css"
           integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
           crossorigin=""/>
@@ -11,43 +11,43 @@
             integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og=="
             crossorigin=""></script>
 </head>
-<body>
-<div id="map" style="height: 500px"></div>
-<h2>Aadress:</h2>
+<body style="height: 100%">
+<div id="map" style="height: 90%"></div>
+<h2>Address:</h2>
 <div id="address"></div>
 
 </body>
 
 <script>
-  const apiKey = '--apikey--';
-  const url = 'https://gdh-api.reach-u.com/wms/service?&apikey=' + apiKey;
+    const apiKey = '--apikey--';
+    const url = 'https://gdh-api.reach-u.com/wms/service?&apikey=' + apiKey;
+    const coordinates = [58.371475, 26.717015];
 
-  const map = L.map('map', {
-    crs: L.CRS.EPSG3857,
+    const map = L.map('map', {
+        crs: L.CRS.EPSG3857,
+    }).setView(coordinates, 13);
 
-  }).setView([58.371475, 26.717015], 13);
+    L.tileLayer.wms(url, {
+        layers: 'GDHdefault',
+        format: 'image/png',
+        version: '1.3.0',
+    }).addTo(map);
 
-  L.tileLayer.wms(url, {
-    layers: 'GDHdefault',
-    format: 'image/png',
-    version: '1.3.0',
-  }).addTo(map);
+    const marker = L.marker(new L.LatLng(coordinates), {
+        draggable: true,
+    }).addTo(map);
 
-  const marker = L.marker(new L.LatLng(58.371475, 26.717015), {
-    draggable: true,
-  }).addTo(map);
+    const getRevGeoCode = async () => {
+        const latLng = marker.getLatLng();
+        const requestUrl = 'https://gdh-api.reach-u.com/rgc?&lat=' + latLng.lat + '&lon=' + latLng.lng + '&apikey=' + apiKey;
+        const request = await fetch(requestUrl);
+        const response = await request.json();
 
-  const getRevGeoCode = async () => {
-    const latLng = marker.getLatLng();
-    const requestUrl = 'https://gdh-api.reach-u.com/rgc?&lat=' + latLng.lat + '&lon=' + latLng.lng + apiKey;
-    const request = await fetch(requestUrl);
-    const response = await request.json();
+        address.innerHTML = response.features[0].properties.full_address;
+    };
 
-    address.innerHTML = response.features[0].properties.full_address;
-  };
+    marker.on('dragend', () => getRevGeoCode());
 
-  marker.on('dragend', () => getRevGeoCode());
-
-  getRevGeoCode();
+    getRevGeoCode();
 </script>
 </html>

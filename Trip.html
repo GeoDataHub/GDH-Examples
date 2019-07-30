@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="height: 100%">
 <head>
     <meta charset="UTF-8">
     <title>Trip Example</title>
@@ -12,12 +12,13 @@
             crossorigin=""></script>
     <script src="https://cdn.jsdelivr.net/npm/@mapbox/polyline@1.1.0/src/polyline.min.js"></script>
 </head>
-<body>
-<div id="map" style="height:500px"></div>
+<body style="height: 100%">
+<div id="map" style="height: 100%"></div>
 </body>
 <script>
+    const apiKey = "--apikey--";
     const url = "https://gdh-api.reach-u.com/routing/trip/v1/driving/";
-    const apiKey = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0IiwianRpIjoiMTM1IiwidHMiOjE1NTk2NDYyNzczODEsImlzcyI6Imh0dHA6Ly9yZWFjaC11LmNvbSJ9.jw8fRm6l078YGqLPv5KAKUV_PheRSqJyrC6s9fpvFXM";
+
     const mapURL = "https://gdh-api.reach-u.com/wms/service?&apikey=" + apiKey;
 
     const map = L.map('map', {
@@ -33,18 +34,18 @@
     let layerGroup = L.layerGroup().addTo(map);
 
     const route = async () => {
-        layerGroup.clearLayers();
+            layerGroup.clearLayers();
 
-        const first = markerOne.getLatLng(), second = markerTwo.getLatLng(), three = markerThree.getLatLng(),
-          four = markerFour.getLatLng();
+            const first = markerOne.getLatLng(), second = markerTwo.getLatLng(), three = markerThree.getLatLng(),
+                four = markerFour.getLatLng();
 
-        const requestUrl = encodeURI(url + first.lng + "," + first.lat + ";" + second.lng + "," + second.lat + ";" + three.lng + "," + three.lat + ";" + four.lng + "," + four.lat + "?apikey=" + apiKey);
+            const requestUrl = encodeURI(url + first.lng + "," + first.lat + ";" + second.lng + "," + second.lat + ";" + three.lng + "," + three.lat + ";" + four.lng + "," + four.lat + "?apikey=" + apiKey);
 
-        const request = await fetch(requestUrl);
-        const response = await request.json();
+            const request = await fetch(requestUrl);
+            const response = await request.json();
 
-        L.polyline(polyline.decode(response.trips[0].geometry), {color: 'red'}).addTo(layerGroup);
-    },
+            L.polyline(polyline.decode(response.trips[0].geometry), {color: 'red'}).addTo(layerGroup);
+        },
 
         markerOne = L.marker(new L.LatLng(58.36274449177186, 26.713943481445316), {draggable: true}).addTo(map),
         markerTwo = L.marker(new L.LatLng(58.38983708965327, 26.728191375732425), {draggable: true}).addTo(map),

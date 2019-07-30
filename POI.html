@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="height: 100%">
 <head>
     <meta charset="UTF-8">
     <title>POI Example</title>
@@ -11,38 +11,40 @@
             integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og=="
             crossorigin=""></script>
 </head>
-<body>
-<div id="map" style="height: 500px"></div>
+<body style="height: 100%;">
+<div id="map" style="height: 100%"></div>
 </body>
 <script>
+    const apiKey = '--apikey--';
     //Choose the point of interest to search for
-  const poi = 'swedbank';
-  const apiKey = '--apikey--';
-  const requestUrl = 'https://gdh-api.reach-u.com/poi?q=' + poi + '&apikey=' + apiKey + '&limit=5';
-  const mapUrl = 'https://gdh-api.reach-u.com/wms/service?&apikey=' + apiKey;
+    const poi = 'swedbank';
+    const limit = 5;
+    const coordinates = [56.944856, 24.977423];
+    const requestUrl = 'https://gdh-api.reach-u.com/poi?q=' + poi + '&apikey=' + apiKey + '&limit=' + limit;
+    const mapUrl = 'https://gdh-api.reach-u.com/wms/service?&apikey=' + apiKey;
 
-  const map = L.map('map', {
-    crs: L.CRS.EPSG3857,
 
-  }).setView([56.944856, 24.977423], 6);
+    const map = L.map('map', {
+        crs: L.CRS.EPSG3857,
 
-  L.tileLayer.wms(mapUrl, {
-    layers: 'GDHdefault',
-    format: 'image/png',
-    version: '1.3.0',
-  }).addTo(map);
+    }).setView(coordinates, 6);
 
-  map.whenReady(function() {
-    fetch(requestUrl).then(function(response) {
-      return response.json();
-    }).then(function(myJson) {
-      let holder = myJson.features.flat();
-      holder.forEach(function(feature) {
-        let test = JSON.stringify(feature.properties);
-        L.marker([feature.bbox[1], feature.bbox[0]]).bindPopup(test).openPopup().addTo(map);
-      });
+    L.tileLayer.wms(mapUrl, {
+        layers: 'GDHdefault',
+        format: 'image/png',
+        version: '1.3.0',
+    }).addTo(map);
+
+    map.whenReady(() => {
+        fetch(requestUrl).then(response => response.json()).then(myJson => {
+            let holder = myJson.features.flat();
+            holder.forEach(feature => {
+                let test = JSON.stringify(feature.properties);
+                console.log(test);
+                L.marker([feature.bbox[1], feature.bbox[0]]).bindPopup(test, {maxWidth: "auto"}).openPopup().addTo(map);
+            });
+        });
+
     });
-
-  });
 </script>
 </html>

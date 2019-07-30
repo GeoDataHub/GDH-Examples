@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="height: 100%">
 <head>
     <meta charset="UTF-8">
     <title>Web Maping Service</title>
@@ -11,19 +11,20 @@
             integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og=="
             crossorigin=""></script>
 </head>
-<body>
-<div id="map" style="height: 500px"></div>
-<div id="mapid" style="height: 500px"></div>
+<body style="height: 100%">
+<div id="map" style="height: 100%"></div>
 </body>
 
 <script>
+
     const apiKey = "--apikey--";
     const url = "https://gdh-api.reach-u.com/wms/service?&apikey=" + apiKey;
+    const coordinates = [58.371475, 26.717015];
 
     const map = L.map('map', {
         crs: L.CRS.EPSG3857
 
-    }).setView([58.371475, 26.717015], 13);
+    }).setView(coordinates, 13);
 
     L.tileLayer.wms(url, {
         layers: 'GDHdefault',

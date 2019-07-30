@@ -10,27 +10,27 @@
     <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"
             integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og=="
             crossorigin=""></script>
-
 </head>
 <body>
 <input id="searchBar" type="text" placeholder="Search for an address" value="Tartu Riia 24">
 <pre id="response"></pre>
 </body>
 <script>
-  const url = 'https://gdh-api.reach-u.com/gc?&apikey=';
-  const apiKey = '--apikey--';
-  const searchBar = document.getElementById('searchBar');
+    const apiKey = '--apikey--';
+    const url = 'https://gdh-api.reach-u.com/gc?&apikey=';
 
-  const geoCode = async () => {
-    const input = '&q=' + searchBar.value;
-    const requestUrl = encodeURI(url + apiKey + input );
-    const req = await fetch(requestUrl);
-    const res = await req.json();
-    response.innerHTML = res.features.map(x => x.properties.full_address).join('\n');
-  };
+    const searchBar = document.getElementById('searchBar');
 
-  searchBar.addEventListener('keyup', geoCode);
-  geoCode();
+    const geoCode = async () => {
+        const input = '&q=' + searchBar.value;
+        const requestUrl = encodeURI(url + apiKey + input);
+        const req = await fetch(requestUrl);
+        const res = await req.json();
+        response.innerHTML = res.features.map(x => x.properties.full_address + "\nCoordinates: " + x.properties.extended_data.centroid + "\n").join('\n');
+    };
+
+    searchBar.addEventListener('keyup', geoCode);
+    geoCode();
 </script>
 </html>
 
