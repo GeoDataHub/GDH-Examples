@@ -1,10 +1,10 @@
-# GDH-WMS
+# GDH
 ### How to use:  
-Replace apikey section with your apikey. API keys can be aquired from https://www.geodatahub.eu/ 
+Replace apikey section with your apikey. API keys can be acquired from https://www.geodatahub.eu/ 
 For current API endpoints the key can be retrieved from here https://gdh-portal.reach-u.com.
   
 ### NOTE  
-Current URLs do not target geodatahub.eu but instead the testing enviorment gdh-api.reach-u.com. Geodatahub.eu apikey will not work unless URLs are changed.
+Current URLs do not target geodatahub.eu but instead the testing environment gdh-api.reach-u.com. Geodatahub.eu apikey will not work unless URLs are changed.
 
 ## Services  
 ### Web Map Service (WMS)  
