@@ -2,144 +2,134 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8"/>
-    <title>Gazetter</title>
-    <style>
-        * {
-            margin: 5px;
-        }
-
-        div {
-            width: 150px;
-            margin-left: 15px;
-        }
-
-        select {
-            width: 150px;
-            align-items: center;
-        }
-    </style>
-    <script
-            src="https://code.jquery.com/jquery-3.4.1.min.js"
-            integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
-            crossorigin="anonymous"
-    ></script>
+    <title>Gazetteer</title>
 </head>
 <body>
-<div id="choices" style="display: block">
-    <h3>COUNTRY</h3>
-    <select id="l0" class="test" onchange="changeStructure(); query(this)"></select>
-</div>
+<div id="levels"></div>
 </body>
 <script>
-    const apikey = '--apikey--';
-    let depth = 0;
-    let queryLevel = 0;
-    let divSelect = $('#choices');
+    let apikey = "--apikey--";
+    let url = "https://gdh-api.reach-u.com/gz/";
+    let params = [];
 
-    //Populates the first list with options, gets currently supported countries
-    $(document).ready(() => {
-        $.getJSON('https://gdh-api.reach-u.com/gz/levels?apikey=' + apikey, result => {
-            $.each(result, (i, field) => {
-                $('#l0').append(
-                    $('<option>', {
-                        text: field,
-                        id: i,
-                    })
-                );
-            });
-        });
-    });
+    let structure;
+    let countryCodes;
 
-    //Since each country has different administrative divisions, the structure needs to be changed based on the country
-    const changeStructure = () => {
-        depth = 0;
-        divSelect.find('h4').remove();
-        divSelect.find('.deafult').remove();
-        let cc = $('#l0')
-            .children(':selected')
-            .attr('id');
-        $(this)
-            .parent('div.order_number')
-            .remove();
-        $.getJSON('https://gdh-api.reach-u.com/gz/levels/' + cc + '?apikey=' + apikey, result => {
-            $.each(result, (i, field) => {
-                depth++;
-                i = 'l' + i.substr(-1);
-                if (i !== 'l0') {
-                    divSelect.append(
-                        $('<h4>', {
-                            text: field,
-                        })
-                    );
-                    divSelect.append(
-                        $('<select>', {
-                            class: 'test deafult',
-                            id: i,
-                            onChange: 'query(this)',
-                            disabled: true,
-                        })
-                    );
-                }
-            });
-        });
+    //Requests new data based on given parameters and the parameter list length
+    const query = () => {
+        fetch(url + params.length + "?" + encodeURI(params.join("&")) + "&apikey=" + apikey)
+            .then(response => response.json())
+            .then(myJson => validate(myJson, params.length))
     };
 
-    const query = val => {
-        let selectValues = [];
-        divSelect.find('.test').each(function () {
-            if ($(this).val() != null) {
-                selectValues.push(this.id + '=' + $(this).val());
-                if (this.id === val.id) {
-                    return false;
-                }
+    //If user selects something in a select box, that selection passes through pre-validation
+    //If the user has selected something that changes the current search tree, remove is triggered to clear the tree
+    const preValidate = (search) => {
+        console.log(search);
+        console.log(params);
+        const level = Number(search.slice().substr(1, 1));
+        if (level < params.length) {
+            if (level === 0) {
+                queryStructure(search.slice(3));
             }
-        });
-        let param = selectValues.join('&');
-        queryLevel = parseInt(selectValues.pop().substr(1, 1)) + 1;
-        responseHandler(param, queryLevel);
+            params.splice(level, 0, search);
+            remove(level);
+        } else {
+                params.push(search);
+                query();
+        }
     };
 
-    const responseHandler = (queryParam, level) => {
-        //get json based on query
-        $.getJSON(
-            'https://gdh-api.reach-u.com/gz/' + level + '?' + queryParam + '&apikey=' + apikey,
-            result => {
-                //if response is empty check if other levels have responses
-                if (result.length === 0 && level < depth) {
-                    responseHandler(queryParam, level + 1);
-                } else if (level < depth) {
-                    //remove elements that are after the selected box
-                    for (let i = queryLevel; i < depth; i++) {
-                        $('#l' + i)
-                            .empty()
-                            .attr('disabled', true);
-                    }
+    //After query validates data. If no data is present, will enter a placeholder and request a higher level
+    //If length is one it automatically adds the parameter to the params list and triggers another query down below
+    //This is because you cannot select an option from a list that has only one option.
+    const validate = (json, level) => {
+        if (json.length === 1) {
+            params.push("l" + json[0].level.substr(-1) + "=" + json[0].value);
+        } else if (json.length === 0) {
+            json.push({level: level.toString()});
+            params.push("");
+        }
 
-                    let levels = '#l' + level;
-                    //add response to the element
-                    $(levels).append(
-                        $('<option>', {
-                            text: '--select--',
-                            selected: 'selected',
-                            disabled: true,
-                            value: '',
-                        })
-                    );
+        //initial structure build
+        if (level === 0) {
+            queryStructure("Eesti");
+        }
 
-                    result.forEach(element => {
-                        $(levels).append(
-                            $('<option>', {
-                                text: element.value,
-                            })
-                        );
-                    });
-                    $(levels).prop('disabled', false);
-                    if (result.length === 2) {
-                        query($(levels));
-                    }
-                }
+        //makes sures that query levels are within the structure levels
+        if (level < structure.length - 1 || level === 0) {
+            build(json, level);
+        }
+    };
+
+    //If Country is changed, queries that countries structure and replaces it
+    const queryStructure = (country) => {
+        const countryCode = getKeyByValue(countryCodes, country);
+        structure = [];
+        fetch(url + "levels/" + countryCode + "?apikey=" + apikey)
+            .then(response => response.json())
+            .then(myJson => Object.values(myJson).forEach(el => structure.push(el)));
+    };
+
+    //Queries only once, gets all available countries and their country codes
+    const queryCountryCodes = () => {
+        fetch(url + "levels?apikey=" + apikey)
+            .then(response => response.json())
+            .then(myJson => countryCodes = myJson);
+    };
+
+    //build function adds based on json response select element and populates it with option elements
+    const build = (json, level) => {
+        //Generate labels and select elements, and add onChange attribute to selects, that trigger query's
+        const selectLabel = document.createElement("h2");
+        selectLabel.textContent = structure[level] ? structure[level] : "COUNTRY NAME";
+        const newSelect = document.createElement("select");
+        newSelect.setAttribute("id", "l" + level + "=");
+        newSelect.onchange = function () {
+            preValidate(newSelect.getAttribute("id") + this.options[this.selectedIndex].value)
+        };
+
+        //Add --select-- option
+        const selectNode = document.createElement("option");
+        selectNode.text = "--select--";
+        newSelect.appendChild(selectNode);
+        //Populate the selects with options based off data from the json
+        json.forEach(object => {
+            const valueNode = document.createElement("option");
+            valueNode.text = object.value;
+            if (!object.value) {
+                valueNode.text = "";
+                newSelect.disabled = true;
             }
-        );
+
+            newSelect.appendChild(valueNode);
+        });
+        document.getElementById("levels").appendChild(selectLabel);
+        document.getElementById("levels").appendChild(newSelect);
+
+        //If there is only one element trigger an immediate query for the next result
+        if (json.length === 1) {
+            query();
+        }
     };
+
+    //Remove function will remove select elements up to a certain index, given by the level property, also removes redundant parameters
+    //from the params list, after that will trigger a query and a build with the new params list
+    const remove = (level) => {
+        const selects = document.getElementById("levels");
+        for (let i = (params.length) * 2 - 1; level * 2 + 1 < i; i--) {
+            if(selects.childNodes[i]){
+                selects.removeChild(selects.childNodes[i]);
+            }
+        }
+        params.length = level + 1;
+        query();
+    };
+
+    //Helper function to find a key by value
+    const getKeyByValue = (object, value) => Object.keys(object).find(key => object[key][0] === value);
+
+    queryCountryCodes();
+    query();
 </script>
 </html>
