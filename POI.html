@@ -40,7 +40,6 @@
             let holder = myJson.features.flat();
             holder.forEach(feature => {
                 let test = JSON.stringify(feature.properties);
-                console.log(test);
                 L.marker([feature.bbox[1], feature.bbox[0]]).bindPopup(test, {maxWidth: "auto"}).openPopup().addTo(map);
             });
         });
